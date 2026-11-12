@@ -1,6 +1,8 @@
 # Freshmart
 
-**Fatoke Market**: a grocery delivery demo. A Python (FastAPI) app that renders its own pages (Jinja2 + HTMX), with TypeScript for the cart and checkout, in one repository.
+**Live demo:** https://freshmart-j97h.onrender.com
+
+**Okwuii's Grocery Store (OGS)**: a grocery delivery demo. A Python (FastAPI) app that renders its own pages (Jinja2 + HTMX), with TypeScript for the cart and checkout, in one repository.
 
 ```
 Freshmart/

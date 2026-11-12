@@ -27,7 +27,7 @@ def trigger(resp):
 def test_home_page_renders(client):
     r = client.get("/")
     assert r.status_code == 200
-    assert "Fatoke" in r.text and 'id="catalog"' in r.text
+    assert "Okwuii" in r.text and 'id="catalog"' in r.text
     assert "/static/js/main.js" in r.text and "/static/vendor/htmx.min.js" in r.text
 
 

@@ -1,4 +1,4 @@
-"""Freshmart (Fatoke Market) backend: FastAPI port of the Express server."""
+"""Freshmart (Okwuii's Grocery Store, OGS) backend: FastAPI port of the Express server."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ from .templating import templates
 async def lifespan(app: FastAPI):
     await db.init()
     mode = "Postgres" if config.USE_POSTGRES else "local JSON file"
-    print(f"Fatoke Market backend (Python) running, data store: {mode}")
+    print(f"Okwuii's Grocery Store backend (Python) running, data store: {mode}")
     yield
 
 
