@@ -1,0 +1,147 @@
+{# Modal shells. Content for sign in / sign up / orders / store inbox is filled in by HTMX;
+   cart + checkout + card simulation are driven by the TypeScript in apps/web/src. #}
+<div class="modal-overlay" id="storeInboxOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="storeTitle">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h2 id="storeTitle">Store SMS inbox</h2>
+      <button class="close-x" type="button" data-close-modal>✕</button>
+    </div>
+    <div class="small-note">This simulates what the store's phone (+234 800 000 0000) would receive by SMS whenever an order comes in. A real deployment sends these through Termii or Africa's Talking from your server, not from the browser.</div>
+    <div id="storeInboxList" style="margin-top:10px;"></div>
+  </div>
+</div>
+
+<div class="overlay" id="cartOverlay"></div>
+<aside class="drawer" id="cartDrawer">
+  <div class="drawer-head">
+    <h2 style="margin:0;font-size:1.05rem;">Your cart</h2>
+    <button class="btn-link" id="clearCartBtn" type="button" hidden>Clear cart</button>
+    <button class="close-x" id="closeCart" type="button">✕</button>
+  </div>
+  <div class="drawer-body" id="cartBody"></div>
+  <div class="drawer-foot" id="cartFoot"></div>
+</aside>
+
+<div class="modal-overlay" id="authOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h2 id="authTitle">Sign in</h2>
+      <button class="close-x" type="button" data-close-modal>✕</button>
+    </div>
+    <div id="authNotice"></div>
+    <div id="authBody"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="signupOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="signupTitle">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h2 id="signupTitle">Create your account</h2>
+      <button class="close-x" type="button" data-close-modal>✕</button>
+    </div>
+    <div id="signupBody"></div>
+  </div>
+</div>
+
+<!-- checkout modal -->
+<div class="modal-overlay" id="checkoutOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h2 id="checkoutTitle">Checkout</h2>
+      <button class="close-x" id="closeCheckout">✕</button>
+    </div>
+    <div class="tab-row">
+      <button id="tabReview" class="active">1. Review order</button>
+      <button id="tabPlace">2. Place order</button>
+    </div>
+    <div id="stepReview"></div>
+    <div id="stepPlace" style="display:none;">
+    <div id="checkoutMsg"></div>
+    <div class="field"><label>Delivery address</label><input id="coAddress" placeholder="House no., street, area"></div>
+    <div class="field"><label>Delivery town</label>
+      <select id="coCity"><option>Otukpo, Benue State</option></select>
+    </div>
+    <div class="field"><label>Phone number</label><input id="coPhone" placeholder="0801 234 5678"></div>
+
+    <label style="display:block;font-size:.85rem;font-weight:600;margin:14px 0 8px;">Payment method</label>
+    <div class="pay-option" data-val="delivery" id="optDelivery">
+      <input type="radio" name="pay" value="delivery">
+      <div><div class="t">Pay on delivery</div><div class="d">Pay cash or by card/transfer to the rider when your order arrives.</div></div>
+    </div>
+    <div class="pay-option" data-val="before" id="optBefore">
+      <input type="radio" name="pay" value="before">
+      <div><div class="t">Pay before delivery</div><div class="d">Card, bank transfer or USSD — order is confirmed once payment clears.</div></div>
+    </div>
+
+    <div id="beforePayPanel" style="display:none;">
+      <div class="tab-row" style="margin-top:6px;">
+        <button id="payTabCard" class="active">Card</button>
+        <button id="payTabTransfer">Bank transfer</button>
+        <button id="payTabUssd">USSD</button>
+      </div>
+      <div id="payCardPanel">
+        <div class="field"><label>Card number</label><input id="cardNumber" placeholder="4111 1111 1111 1111"></div>
+        <div style="display:flex;gap:10px;">
+          <div class="field" style="flex:1;"><label>Expiry</label><input id="cardExpiry" placeholder="MM/YY"></div>
+          <div class="field" style="flex:1;"><label>CVV</label><input id="cardCvv" placeholder="123"></div>
+        </div>
+      </div>
+      <div id="payTransferPanel" style="display:none;">
+        <label style="display:block;font-size:.82rem;margin-bottom:6px;opacity:.8;">Select your bank or microfinance bank</label>
+        <div class="bank-list" id="bankList"></div>
+      </div>
+      <div id="payUssdPanel" style="display:none;">
+        <div class="field"><label>Select your bank for a USSD code</label>
+          <select id="ussdBank">
+            <option>GTBank</option><option>Access Bank</option><option>Zenith Bank</option><option>UBA</option><option>First Bank</option>
+          </select>
+        </div>
+        <div class="small-note" id="ussdCodeNote"></div>
+      </div>
+      <div class="small-note">This demo simulates the payment step. A real deployment routes this through a licensed Nigerian payment aggregator (e.g. Paystack or Flutterwave), which is what actually connects the checkout to commercial banks and microfinance banks — no card, transfer or account details here are sent anywhere or charged.</div>
+    </div>
+
+    <button class="btn-primary" id="placeOrderBtn">Place order — ₦0</button>
+    <button class="btn-ghost" id="backToReview">Back to review</button>
+    </div>
+  </div>
+</div>
+
+<!-- card payment processing modal -->
+<div class="modal-overlay" id="processingOverlay">
+  <div class="modal" id="processingModal"></div>
+</div>
+
+<!-- confirmation modal -->
+<div class="modal-overlay" id="confirmOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="confirm-icon">✅</div>
+    <h2 id="confirmTitle" style="text-align:center;">Order placed</h2>
+    <p style="text-align:center;font-size:.9rem;opacity:.8;" id="confirmText"></p>
+    <button class="btn-ghost" id="copyRef" type="button">Copy order reference</button>
+    <button class="btn-primary" id="confirmClose">Done</button>
+    <button class="btn-ghost" id="confirmLogout" type="button" hx-post="/ui/logout" hx-target="#account-area" hx-swap="innerHTML">Sign out</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="trackOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="trackTitle">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h2 id="trackTitle">Track an order</h2>
+      <button class="close-x" type="button" data-close-modal>✕</button>
+    </div>
+    <p style="font-size:.85rem;opacity:.75;margin-top:0;">No account needed. Enter your order reference and the phone number you used.</p>
+    <div id="trackBody"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="ordersOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ordersTitle">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h2 id="ordersTitle">Your orders</h2>
+      <button class="close-x" type="button" data-close-modal>✕</button>
+    </div>
+    <div id="ordersList"></div>
+    <button class="btn-ghost" id="ordersLogout" type="button" hx-post="/ui/logout" hx-target="#account-area" hx-swap="innerHTML">Sign out</button>
+  </div>
+</div>
