@@ -313,10 +313,11 @@ def test_page_has_a_back_to_top_button(client):
     assert 'id="backToTop"' in client.get("/").text
 
 
-def test_home_explains_delivery_fee_payment_and_tracking(client):
+def test_home_explains_payment_and_tracking(client):
     html = client.get("/").text
-    assert "How ordering works" in html and "₦800 delivery fee" in html
+    assert "How ordering works" in html
     assert "Pay on delivery" in html and "Track every order" in html
+    assert "delivery fee on every order" not in html
 
 
 def test_confirmation_offers_to_copy_the_order_reference(client):
