@@ -40,8 +40,14 @@ async def init() -> None:
               pay_method TEXT NOT NULL, payment_detail JSONB, status TEXT NOT NULL,
               user_email TEXT NOT NULL REFERENCES users(email));
             CREATE TABLE IF NOT EXISTS store_sms (
-              id TEXT NOT NULL, text TEXT NOT NULL, date TIMESTAMPTZ NOT NULL);
+              id TEXT NOT NULL, text TEXT NOT NULL, date TIMESTAMPTZ NOT NULL,
+              delivery TEXT, delivery_error TEXT);
             """
+        )
+        # Older databases predate the SMS delivery columns.
+        await c.execute(
+            "ALTER TABLE store_sms ADD COLUMN IF NOT EXISTS delivery TEXT;"
+            "ALTER TABLE store_sms ADD COLUMN IF NOT EXISTS delivery_error TEXT;"
         )
 
 
@@ -143,16 +149,27 @@ async def add_order(o: dict) -> None:
 async def get_store_sms():
     async with _pool.acquire() as c:
         rows = await c.fetch("SELECT * FROM store_sms ORDER BY date DESC")
-    return [{"id": r["id"], "text": r["text"], "date": _iso(r["date"])} for r in rows]
+    return [
+        {
+            "id": r["id"],
+            "text": r["text"],
+            "date": _iso(r["date"]),
+            "delivery": r["delivery"] or "demo",
+            "deliveryError": r["delivery_error"] or "",
+        }
+        for r in rows
+    ]
 
 
 async def add_store_sms(e: dict) -> None:
     async with _pool.acquire() as c:
         await c.execute(
-            "INSERT INTO store_sms (id,text,date) VALUES ($1,$2,$3)",
+            "INSERT INTO store_sms (id,text,date,delivery,delivery_error) VALUES ($1,$2,$3,$4,$5)",
             e["id"],
             e["text"],
             _ts(e["date"]),
+            e.get("delivery") or "demo",
+            e.get("deliveryError") or "",
         )
 
 

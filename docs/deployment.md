@@ -9,6 +9,20 @@
 3. Render creates the service and database. It sets `DATABASE_URL` and generates `JWT_SECRET` and `STORE_STAFF_KEY`.
 4. Open the service's **Environment** tab to read `STORE_STAFF_KEY`. Staff use it to open the Store SMS inbox.
 
+### Texting the shop (optional)
+
+Orders always compose a message for the shop; whether it is actually sent depends on these variables:
+
+| Variable | Example | Notes |
+| --- | --- | --- |
+| `SMS_PROVIDER` | `termii` | `termii` or `africastalking`. Unset keeps demo mode. |
+| `SMS_API_KEY` | | The provider's API key. Server-side only. |
+| `SMS_SENDER_ID` | `OGS` | An alphanumeric sender ID approved by the provider. |
+| `STORE_PHONE` | `+2348031234567` | Where the order texts go, in international form. |
+| `AFRICASTALKING_USERNAME` | `sandbox` | Africa's Talking only. |
+
+A gateway failure never blocks an order: the order is saved, the staff feed keeps the message, and the delivery column records why it did not go out.
+
 ## Manual setup instead of the Blueprint
 
 - Root directory: `apps/api`

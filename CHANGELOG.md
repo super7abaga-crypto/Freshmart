@@ -1,5 +1,22 @@
 # Changelog
 
+## Store polish and real SMS
+
+### Storefront
+- The hero reads "Groceries and snacks, brought to your door step".
+- The delivery-fee card is gone from the info strip; the fee still applies at checkout.
+
+### Cart
+- Clearing the cart opens an in-app confirmation sheet instead of the browser's own dialog: item count, "Keep my items" beside the destructive action, Escape or tap-outside to cancel, a bottom sheet on phones.
+
+### Delivery and caching
+- Asset URLs carry a content hash (`main.js?v=…`), so a deploy always reaches the browser. Versioned files are cached for good, unversioned ones always revalidate.
+
+### Store SMS
+- New orders compose the shop text exactly as before, and the message is stored in the staff feed.
+- Set `SMS_PROVIDER`, `SMS_API_KEY`, `SMS_SENDER_ID` and `STORE_PHONE` to have the server text it to the shop through Termii or Africa's Talking. Each stored message records whether it was sent, or why it was not.
+- A gateway that is slow or down never blocks an order.
+
 ## Premium polish
 
 ### Shopping

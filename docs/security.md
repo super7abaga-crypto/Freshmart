@@ -17,7 +17,8 @@
 
 ## Known limits
 
-- Payments and SMS are simulated. Do not collect real card details with this code.
+- Payments are simulated. Do not collect real card details with this code.
+- The order SMS is sent from the server only when the gateway variables are set; the API key never reaches the browser.
 - The rate limiter is in memory and per process. Running several instances needs a shared store such as Redis.
 - The staff key is one shared secret, not per-person accounts. Rotate it in the Render Environment tab if someone leaves.
 - The JSON file store is for development only. It is not safe for concurrent production use.

@@ -32,13 +32,14 @@ Run `make help` for the full list. With no `DATABASE_URL` set, data is kept in a
 
 ## What is real and what is simulated
 
-| Real | Simulated |
+| Real | Simulated or optional |
 | --- | --- |
 | Accounts with hashed passwords and httpOnly session cookies | Card, bank transfer and USSD payments (no money moves) |
-| Orders saved server-side with prices recalculated from the server catalog | The "SMS to store" message (logged and shown in a staff-only inbox) |
-| Staff-only store inbox protected by a staff key | |
+| Orders saved server-side with prices recalculated from the server catalog, and a staff-only inbox behind a staff key | The new-order SMS reaches the shop's phone only once an SMS gateway is configured; until then it stays in the staff feed |
 
-To make payments real, integrate Paystack or Flutterwave. To make SMS real, use Termii or Africa's Talking. Both must be called from the API, never from the browser.
+To make payments real, integrate Paystack or Flutterwave.
+
+SMS is already wired to the API. Set `SMS_PROVIDER`, `SMS_API_KEY`, `SMS_SENDER_ID` and `STORE_PHONE` and every new order is texted to the shop's phone through Termii or Africa's Talking; leave them unset and the message is only collected in the staff feed, as before. The gateway is called server-side, never from the browser.
 
 ## Documentation
 

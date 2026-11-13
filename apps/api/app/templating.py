@@ -8,6 +8,7 @@ from pathlib import Path
 
 from fastapi.templating import Jinja2Templates
 
+from . import sms
 from .config import STATIC_DIR
 
 TEMPLATE_DIR = Path(__file__).resolve().parent / "templates"
@@ -36,6 +37,7 @@ def asset_version() -> str:
 
 
 templates.env.globals["asset_v"] = asset_version()
+templates.env.globals["sms_live"] = sms.configured()[0]
 
 
 def naira(value: int | float) -> str:

@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse
 
-from .. import auth, db, order_status
+from .. import auth, db, order_status, sms
 from ..phone import normalise as normalise_phone
 from ..products import DELIVERY_FEE, find_option
 
@@ -114,9 +114,20 @@ async def place_order(request: Request, user: dict = Depends(auth.require_auth))
         f"New order {order['id']} — ₦{naira(total)}. {summary}. "
         f"Deliver to: {order['address']}, {city_s}. Customer: {order['phone']}. {pay_line}."
     )
-    await db.add_store_sms({"id": order["id"], "text": text, "date": now})
+    delivery = await sms.send(text)
+    await db.add_store_sms(
+        {
+            "id": order["id"],
+            "text": text,
+            "date": now,
+            "delivery": "sent"
+            if delivery["sent"]
+            else ("demo" if delivery["provider"] == "demo" else "failed"),
+            "deliveryError": delivery.get("error") or "",
+        }
+    )
 
-    return {"order": order}
+    return {"order": order, "sms": {"sent": delivery["sent"], "provider": delivery["provider"]}}
 
 
 @router.get("/mine")

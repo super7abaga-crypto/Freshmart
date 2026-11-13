@@ -39,6 +39,14 @@ COOKIE_NAME = "fm_token"
 TOKEN_TTL_SECONDS = 30 * 24 * 60 * 60
 COOKIE_SECURE = IS_PRODUCTION
 
+# Store SMS. Leave SMS_PROVIDER empty to keep the demo inbox only; set all four
+# values to text every new order to the shop phone (see app/sms.py).
+SMS_PROVIDER = os.environ.get("SMS_PROVIDER", "").strip().lower()
+SMS_API_KEY = os.environ.get("SMS_API_KEY", "").strip()
+SMS_SENDER_ID = os.environ.get("SMS_SENDER_ID", "").strip()
+STORE_PHONE = os.environ.get("STORE_PHONE", "").strip()
+AT_USERNAME = os.environ.get("AFRICASTALKING_USERNAME", "").strip()
+
 # Staff feed protection. If unset in production the feed is disabled (403).
 STORE_STAFF_KEY = os.environ.get("STORE_STAFF_KEY", "").strip()
 PORT = int(os.environ.get("PORT", "4000"))

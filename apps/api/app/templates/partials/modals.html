@@ -6,7 +6,15 @@
       <h2 id="storeTitle">Store SMS inbox</h2>
       <button class="close-x" type="button" data-close-modal>✕</button>
     </div>
-    <div class="small-note">This simulates what the store's phone (+234 800 000 0000) would receive by SMS whenever an order comes in. A real deployment sends these through Termii or Africa's Talking from your server, not from the browser.</div>
+    <div class="small-note">
+      {%- if sms_live -%}
+      Every new order is texted to the store's phone, and the same message lands here.
+      {%- else -%}
+      Every new order composes a text for the store's phone. No SMS gateway is connected in this
+      demo, so the messages are collected here instead of being sent; the server speaks to Termii
+      or Africa's Talking the moment SMS_PROVIDER, SMS_API_KEY, SMS_SENDER_ID and STORE_PHONE are set.
+      {%- endif -%}
+    </div>
     <div id="storeInboxList" style="margin-top:10px;"></div>
   </div>
 </div>

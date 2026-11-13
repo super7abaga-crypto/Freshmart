@@ -12,7 +12,7 @@ import {
   total,
 } from "./cart";
 import { runCardPaymentFlow } from "./payment";
-import type { OrderInfo, PayMethod, PaymentDetail, PlacedOrder } from "./types";
+import type { OrderInfo, PayMethod, PaymentDetail, PlacedOrder, SmsResult } from "./types";
 
 const BANKS = [
   "GTBank", "Access Bank", "Zenith Bank", "UBA", "First Bank", "Fidelity Bank", "Union Bank", "Sterling Bank",
@@ -28,12 +28,12 @@ let payTab: "card" | "transfer" | "ussd" = "card";
 let selectedBank: string | null = null;
 let isSignedIn: () => boolean = () => false;
 let promptSignIn: (message: string) => void = () => undefined;
-let onOrderPlaced: (order: PlacedOrder) => void = () => undefined;
+let onOrderPlaced: (order: PlacedOrder, sms: SmsResult | null) => void = () => undefined;
 
 export function configureCheckout(opts: {
   isSignedIn: () => boolean;
   promptSignIn: (message: string) => void;
-  onOrderPlaced: (order: PlacedOrder) => void;
+  onOrderPlaced: (order: PlacedOrder, sms: SmsResult | null) => void;
 }): void {
   isSignedIn = opts.isSignedIn;
   promptSignIn = opts.promptSignIn;
@@ -223,8 +223,9 @@ async function finalizeOrder(info: OrderInfo, detail: PaymentDetail): Promise<vo
     return { productId, optionIndex: Number(optionIndex), qty: l.qty, note: l.note };
   });
   let order: PlacedOrder;
+  let sms: SmsResult | null = null;
   try {
-    const data = await postJson<{ order: PlacedOrder }>("/api/orders", {
+    const data = await postJson<{ order: PlacedOrder; sms?: SmsResult }>("/api/orders", {
       items,
       address: info.address,
       phone: info.phone,
@@ -233,6 +234,7 @@ async function finalizeOrder(info: OrderInfo, detail: PaymentDetail): Promise<vo
       paymentDetail: detail,
     });
     order = data.order;
+    sms = data.sms ?? null;
   } catch (err) {
     checkoutMsg(errorMessage(err, "Couldn't place your order — please try again."));
     show($("checkoutOverlay"));
@@ -240,7 +242,7 @@ async function finalizeOrder(info: OrderInfo, detail: PaymentDetail): Promise<vo
   }
   clearCart();
   hide($("checkoutOverlay"));
-  onOrderPlaced(order);
+  onOrderPlaced(order, sms);
 }
 
 export function initCheckout(): void {

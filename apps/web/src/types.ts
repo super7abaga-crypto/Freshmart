@@ -54,6 +54,12 @@ export interface PlacedOrder {
   items: { qty: number; name: string }[];
 }
 
+/** Whether the shop was actually texted about this order. */
+export interface SmsResult {
+  sent: boolean;
+  provider: string;
+}
+
 export interface ApiError {
   error?: string;
 }

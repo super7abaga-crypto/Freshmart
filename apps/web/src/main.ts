@@ -1,7 +1,7 @@
 import { initCart, rehydrateGrid, setCheckoutHandler, setDeliveryFee } from "./cart";
 import { configureCheckout, initCheckout, openCheckout } from "./checkout";
 import { $, $maybe, clear, h, hide, money, show } from "./dom";
-import type { PlacedOrder } from "./types";
+import type { PlacedOrder, SmsResult } from "./types";
 
 /** Entry point. The server renders the pages (Jinja + HTMX); this file only
  * handles what needs the browser: the cart, checkout, modals and toasts. */
@@ -86,10 +86,15 @@ function showSuccessToast(text: string): void {
 }
 
 let smsTimer: number | undefined;
-function showSmsToast(text: string): void {
+function showSmsToast(text: string, sent: boolean): void {
   const t = $("smsToast");
   clear(t);
-  t.append("📩 ", h("strong", { text: "SMS sent to store" }), h("br"), text);
+  t.append(
+    "📩 ",
+    h("strong", { text: sent ? "SMS sent to store" : "Text for the store (demo, not sent)" }),
+    h("br"),
+    text,
+  );
   t.style.display = "block";
   window.clearTimeout(smsTimer);
   smsTimer = window.setTimeout(() => (t.style.display = "none"), 6000);
@@ -158,11 +163,12 @@ function initAuthEvents(): void {
 
 // ---------- order confirmation ----------
 
-function showOrderPlaced(order: PlacedOrder): void {
+function showOrderPlaced(order: PlacedOrder, sms: SmsResult | null): void {
   const items = order.items.map((i) => `${i.qty}x ${i.name}`).join(", ");
   const payLine = order.payMethod === "before" ? "PAID (before delivery)" : "Pay on delivery";
   showSmsToast(
     `New order ${order.id} — ${money(order.total)}. ${items}. Deliver to: ${order.address}, ${order.city}. Customer: ${order.phone}. ${payLine}.`,
+    sms?.sent === true,
   );
 
   const d = order.paymentDetail as Record<string, string | undefined>;

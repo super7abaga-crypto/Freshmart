@@ -40,7 +40,7 @@ Staff only. These endpoints expose customer addresses and phone numbers.
 | POST | `/api/store/login` | none | Body `{"key": "..."}`. On success sets the `fm_staff` cookie (12 hours, httpOnly, SameSite=Strict). Rate limited to 5 per minute. |
 | POST | `/api/store/logout` | none | Clear the staff cookie. |
 | GET | `/api/store/session` | none | `{"enabled": bool, "staff": bool}` so the UI knows whether to show the sign-in form. |
-| GET | `/api/store/notifications` | staff cookie or `X-Staff-Key` header | The simulated store SMS feed. |
+| GET | `/api/store/notifications` | staff cookie or `X-Staff-Key` header | The store SMS feed, including whether each message was texted or only stored. |
 
 In production the inbox is disabled (403) unless `STORE_STAFF_KEY` is set. In local development with no key set it is open.
 
