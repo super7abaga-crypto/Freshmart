@@ -1,11 +1,37 @@
 import { h } from "./dom";
 
+/** Trash outline, drawn as SVG so it takes the theme colour (emoji render multicolour). */
+function trashIcon(): SVGSVGElement {
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("width", "26");
+  svg.setAttribute("height", "26");
+  svg.setAttribute("fill", "none");
+  svg.setAttribute("stroke", "currentColor");
+  svg.setAttribute("stroke-width", "1.7");
+  svg.setAttribute("stroke-linecap", "round");
+  svg.setAttribute("stroke-linejoin", "round");
+  svg.setAttribute("aria-hidden", "true");
+  for (const d of [
+    "M4 7h16",
+    "M9.5 7V5.5A1.5 1.5 0 0 1 11 4h2a1.5 1.5 0 0 1 1.5 1.5V7",
+    "M6.5 7l.8 11.2A2 2 0 0 0 9.3 20h5.4a2 2 0 0 0 2-1.8L17.5 7",
+    "M10.5 11v5",
+    "M13.5 11v5",
+  ]) {
+    const path = document.createElementNS(ns, "path");
+    path.setAttribute("d", d);
+    svg.append(path);
+  }
+  return svg;
+}
+
 export interface ConfirmOptions {
   title: string;
   text: string;
   confirmLabel: string;
   cancelLabel?: string;
-  icon?: string;
 }
 
 /**
@@ -36,7 +62,7 @@ export function confirmAction(opts: ConfirmOptions): Promise<boolean> {
       "div",
       { class: "action-sheet", role: "alertdialog", "aria-modal": "true", "aria-labelledby": titleId, "aria-describedby": textId },
       h("div", { class: "action-sheet-grip", "aria-hidden": "true" }),
-      h("div", { class: "action-sheet-icon", "aria-hidden": "true", text: opts.icon ?? "🗑" }),
+      h("div", { class: "action-sheet-icon", "aria-hidden": "true" }, trashIcon()),
       h("h2", { class: "action-sheet-title", id: titleId, text: opts.title }),
       h("p", { class: "action-sheet-text", id: textId, text: opts.text }),
       h("div", { class: "action-sheet-actions" }, cancel, confirm),
