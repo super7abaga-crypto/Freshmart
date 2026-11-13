@@ -29,6 +29,8 @@ def test_home_page_renders(client):
     assert r.status_code == 200
     assert "Okwuii" in r.text and 'id="catalog"' in r.text
     assert "/static/js/main.js" in r.text and "/static/vendor/htmx.min.js" in r.text
+    # Assets carry a content hash so a deploy busts the browser cache.
+    assert "/static/js/main.js?v=" in r.text and "/static/styles.css?v=" in r.text
 
 
 def test_static_assets_served(client):

@@ -3,9 +3,12 @@ text (addresses, notes, names) is always HTML-escaped by default."""
 
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 
 from fastapi.templating import Jinja2Templates
+
+from .config import STATIC_DIR
 
 TEMPLATE_DIR = Path(__file__).resolve().parent / "templates"
 
@@ -13,6 +16,26 @@ templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 # Jinja2Templates enables autoescape for .html templates. Make that explicit
 # so a future change cannot silently turn it off.
 templates.env.autoescape = True
+
+
+def asset_version() -> str:
+    """Short content hash of the built front-end files.
+
+    Appended to asset URLs as ?v=... so a deploy always busts the browser cache,
+    even though /static/ is served with a long max-age.
+    """
+    digest = hashlib.sha256()  # noqa: S324 - a cache key, not a security control
+    seen = False
+    for rel in ("js/main.js", "styles.css", "vendor/htmx.min.js"):
+        try:
+            digest.update((STATIC_DIR / rel).read_bytes())
+            seen = True
+        except OSError:
+            continue
+    return digest.hexdigest()[:10] if seen else "dev"
+
+
+templates.env.globals["asset_v"] = asset_version()
 
 
 def naira(value: int | float) -> str:

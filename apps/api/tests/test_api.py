@@ -242,7 +242,10 @@ def test_csp_forbids_inline_and_foreign_scripts(client):
 
 
 def test_static_is_cacheable_but_pages_and_api_are_not(client):
-    assert "max-age=86400" in client.get("/static/styles.css").headers["cache-control"]
+    # Unversioned assets revalidate every time, so a deploy is never missed.
+    assert client.get("/static/styles.css").headers["cache-control"] == "no-cache"
+    versioned = client.get("/static/styles.css?v=abc123").headers["cache-control"]
+    assert "immutable" in versioned and "max-age=31536000" in versioned
     assert client.get("/").headers["cache-control"] == "no-store"
     assert client.get("/api/health").headers["cache-control"] == "no-store"
 
