@@ -1,3 +1,4 @@
+import { confirmAction } from "./dialog";
 import { $, clear, h, hide, money, show } from "./dom";
 import { fetchCatalog, loadCart, saveCart } from "./persist";
 import type { CartEntry, CartLine, Product } from "./types";
@@ -218,8 +219,18 @@ export async function initCart(): Promise<void> {
   $("cartBtn").onclick = openCart;
   $("cartFab").onclick = openCart;
   $("closeCart").onclick = closeCart;
-  $("clearCartBtn").onclick = () => {
-    if (window.confirm("Remove everything from your cart?")) clearCart();
+  $("clearCartBtn").onclick = async (): Promise<void> => {
+    const units = lines().reduce((a, l) => a + l.qty, 0);
+    const one = units === 1;
+    const ok = await confirmAction({
+      title: one ? "Remove this item?" : "Clear your cart?",
+      text: one
+        ? "Your cart will be empty again. Nothing is charged."
+        : `All ${units} items will be taken out of your cart. Nothing is charged.`,
+      confirmLabel: one ? "Remove item" : `Remove ${units} items`,
+      cancelLabel: one ? "Keep it" : "Keep my items",
+    });
+    if (ok) clearCart();
   };
   $("cartOverlay").onclick = closeCart;
 
